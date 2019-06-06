@@ -1,0 +1,10 @@
+{% if companies.count > 0 %}
+
+{% for company in companies %}
+
+<li><a href="../{{company.get_absolute_url}}"><p align="left" style="padding-left: 2vw; color: #000000;">{{ company.c_name}}<span style="float:right; padding-right: 2vw;">{{ company.c_acro}}</span></p></a></li>
+{% endfor %}
+
+{% else %}
+
+{% endif %}

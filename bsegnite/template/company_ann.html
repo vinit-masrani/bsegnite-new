@@ -1,0 +1,693 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>BSEgnite - {{ companydetails.c_id }} - {{ companydetails.c_name }}
+    </title>
+<!-- {% for i in query_set|slice:":1" %}
+
+              {{i.c}} - {{i.c_id}}
+              {% endfor %} -->
+    <!-- Bootstrap core CSS-->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+    <!-- Page level plugin CSS-->
+    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+
+     <link href="{% static 'font/css/fontello.css' %}" rel="stylesheet">
+     <link href="{% static 'fontello/css/fontello.css' %}" rel="stylesheet">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+  $('#search_company').keyup(function(){
+    $.ajax({
+      type:"POST",
+      url:"/announcement/search/",
+      data:{
+        'search_company' : $('#search_company').val(),
+        'csrfmiddlewaretoken': '{{ csrf_token }}',
+      },
+      success : searchSuccess,
+      dataType : 'html'
+    });
+  });
+});
+function searchSuccess(data,textStatus,jqXHR)
+{
+  $('#search_result').html(data);
+}
+    </script>
+    <style type="text/css">
+      .spacing{
+        margin-left: 0.8vw !important;
+      }
+      .search_result ul{
+    margin:0px;
+}
+.search_result li{
+    font-size:14px;
+    margin-left:25px;
+    padding:0px;
+    list-style:url(images/arrow.png);
+    line-height:30px;
+}
+.search_result li a:link, .search_result li a:visited{
+    color:#1e598e;
+    text-decoration:none;
+}
+.search_result li a:hover{
+    color:#0A7CAF;
+    /*padding:2px;*/
+    -moz-box-shadow: 0px 0px 12px #9e9ea3;
+    -webkit-box-shadow: 0px 0px 12px #9e9ea3;
+    box-shadow: 0px 0px 12px #9e9ea3;
+    border:none 0px #000000;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+    </style>
+  </head>
+
+  <body id="page-top">
+
+    <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+
+      <a class="navbar-brand mr-1" href="/">BSEgnite</a>
+
+
+      <!-- Navbar Search -->
+      
+
+      <!-- Navbar -->
+      <ul class="navbar-nav ml-auto ml-md-0">
+        {%  if user.is_authenticated %}
+         <a href="../dashboard/"><i class="icon-gauge"></i></a>
+         {% endif %}
+        <li class="nav-item dropdown no-arrow">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-user-circle fa-fw"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+            {%  if user.is_authenticated %}
+            <h4 class="dropdown-item">{{ user.username }}</h4>
+            <a class="dropdown-item" href="../customize">Settings</a>
+            <a class="dropdown-item" href="../../account/password_change">Change Password</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            {% else %}
+            
+            <a class="dropdown-item" href="/account/login/">Login</a>
+             <a class="dropdown-item" href="/account/register/">Register</a>
+
+
+            {%  endif %}
+          </div>
+        </li>
+      </ul>
+
+    </nav>
+
+    
+      <div id="content-wrapper">
+
+        <div class="container-fluid">
+
+          <!-- Breadcrumbs-->
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="../../company">Company</a>
+            </li>
+            <li class="breadcrumb-item active">Company Announcements</li>
+          </ol>
+<br>
+<div class="d-flex justify-content-center align-items-center">
+<form method="POST" class="form-inline md-form form-sm mt-0">
+<div class="autocomplete" style="width: 40vw;">
+<i class="fas fa-search" aria-hidden="true"></i>
+<input id = "search_company" name = "search"  class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Search for Company" aria-label="Search"/>
+<div class="search_result">
+<ul id="search_result" class="list-unstyled" style="position: absolute; z-index: 99; background: #66a0ff; width: 32.5vw;">
+</ul>
+</div>
+</div>
+</form>
+</div>
+
+<br><br><br>
+<!-- Page Content -->
+          <h1>
+              {{ companydetails.c_id }} - {{ companydetails.c_name }}
+          </h1>
+          <hr>
+
+<form method="POST">
+ <!-- <button type="button" data-toggle="collapse" data-target="#demo">Simple collapsible</button>
+  <div id="demo" class="collapse"> -->
+
+    <h2> Total Announcement ( {{totcountsubcat}} )</h2>
+        <div class="row justify-content-start">
+    <div class="col-12 col-md-6">
+
+
+ {% if countsubcat.24 %}
+  <label class="btn btn-primary">
+        {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %}    
+    <input type="checkbox" name="subcategorylist" id="agm" value="24"{% if '24' in checkingsubcat %} checked{% endif %}> Acquisition ( {{ countsubcat.24 }} )
+  </label>
+  
+   {% if countsubcat.39 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="39"{% if '39' in checkingsubcat %} checked{% endif %}> Agreement ( {{ countsubcat.39 }} )
+  </label>
+
+   {% if countsubcat.45 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="45"{% if '45' in checkingsubcat %} checked{% endif %}> Amalgamation / Merger / Demerger ( {{ countsubcat.45 }} )
+  </label>
+
+{% if countsubcat.13 %}
+<label class="btn btn-primary">
+   {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="13"{% if '13' in checkingsubcat %} checked{% endif %}> Appointment ( {{ countsubcat.13 }} )
+  </label>
+
+      {% if countsubcat.42 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="42"{% if '42' in checkingsubcat %} checked{% endif %}> Award of Order ( {{ countsubcat.42 }} )
+  </label>
+
+      {% if countsubcat.35 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="35"{% if '35' in checkingsubcat %} checked{% endif %}> BuyBack ( {{ countsubcat.35 }} )
+  </label>
+
+  {% if countsubcat.49 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="49"{% if '49' in checkingsubcat %} checked{% endif %}> Corporate Insolvency Resolution Process ( {{ countsubcat.49 }} )
+  </label>
+
+  {% if countsubcat.25 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="25"{% if '25' in checkingsubcat %} checked{% endif %}> Credit Rating ( {{ countsubcat.25 }} )
+  </label>
+
+  {% if countsubcat.47 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="47"{% if '47' in checkingsubcat %} checked{% endif %}> Default ( {{ countsubcat.47 }} )
+  </label>
+
+    {% if countsubcat.8 %}
+    <label class="btn btn-primary">
+       {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="8"{% if '8' in checkingsubcat %} checked{% endif %}> Earnings Conference Call ( {{ countsubcat.8 }} )
+  </label>
+
+    {% if countsubcat.43 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="43"{% if '43' in checkingsubcat %} checked{% endif %}> Joint Ventures ( {{ countsubcat.43 }} )
+  </label>
+
+      {% if countsubcat.36 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="36"{% if '36' in checkingsubcat %} checked{% endif %}> New Openings ( {{ countsubcat.36 }} )
+  </label>
+
+   {% if countsubcat.32 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="32"{% if '32' in checkingsubcat %} checked{% endif %}> Open Offer ( {{ countsubcat.32 }} )
+  </label>
+
+    {% if countsubcat.37 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="37"{% if '37' in checkingsubcat %} checked{% endif %}> Raising of Funds ( {{ countsubcat.37 }} )
+  </label>
+
+    {% if countsubcat.27 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="27"{% if '27' in checkingsubcat %} checked{% endif %}> Resignation ( {{ countsubcat.27 }} )
+  </label>
+  {% if countsubcat.26 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="26"{% if '26' in checkingsubcat %} checked{% endif %}> Scheme of arrangement ( {{ countsubcat.26 }} )
+  </label>
+
+
+     {% if countsubcat.41 %}
+    <label class="btn btn-primary">
+       {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="41"{% if '41' in checkingsubcat %} checked{% endif %}> Strikes/Lockouts/Disturbances ( {{ countsubcat.41 }} )
+  </label>
+
+  {% if countsubcat.34 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="34"{% if '34' in checkingsubcat %} checked{% endif %}> Sub-Division ( {{ countsubcat.34 }} )
+  </label>
+</div>
+   
+<div class="col-12 col-md-6">
+ {% if countsubcat.40 %}
+    <label class="btn btn-primary">
+       {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="40"{% if '40' in checkingsubcat %} checked{% endif %}> Amendments ( {{ countsubcat.40 }} )
+  </label>
+
+      {% if countsubcat.29 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="29"{% if '29' in checkingsubcat %} checked{% endif %}> Change in Directorate ( {{ countsubcat.29 }} )
+  </label>
+
+      {% if countsubcat.14 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+  <input type="checkbox" name="subcategorylist" id="agm" value="14"{% if '14' in checkingsubcat %} checked{% endif %}> Clarification ( {{ countsubcat.14 }} )
+  </label>
+
+    {% if countsubcat.6 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="6"{% if '6' in checkingsubcat %} checked{% endif %}> Closing of Trading window( {{ countsubcat.6 }} )
+  </label>
+
+
+      {% if countsubcat.33 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="33"{% if '33' in checkingsubcat %} checked{% endif %}> Dividend ( {{ countsubcat.33 }} )
+  </label>
+
+     {% if countsubcat.22 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="22"{% if '22' in checkingsubcat %} checked{% endif %}> Earnings Call Transcript ( {{ countsubcat.22 }} )
+  </label>
+
+    {% if countsubcat.23 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="23"{% if '23' in checkingsubcat %} checked{% endif %}> Earnings Call ( {{ countsubcat.23 }} )
+  </label>
+
+    {% if countsubcat.20 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="20"{% if '20' in checkingsubcat %} checked{% endif %}> EXTRA-ORDINARY GENERAL MEETING ( {{ countsubcat.20 }} )
+  </label>
+
+     {% if countsubcat.18 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="18"{% if '18' in checkingsubcat %} checked{% endif %}> Intimation  ( {{ countsubcat.18 }} )
+  </label>
+
+      {% if countsubcat.1 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="1" {% if '1' in checkingsubcat %} checked{% endif %}> Investor Complaints ( {{ countsubcat.1 }} )
+  </label>  
+
+       {% if countsubcat.44 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="44"{% if '44' in checkingsubcat %} checked{% endif %}> Investor Presentation ( {{ countsubcat.44 }} )
+  </label>
+
+    {% if countsubcat.30 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="30"{% if '30' in checkingsubcat %} checked{% endif %}> Meetings Update ( {{ countsubcat.30 }} )
+  </label>
+
+     {% if countsubcat.38 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="38"{% if '38' in checkingsubcat %} checked{% endif %}> Newspaper Publications ( {{ countsubcat.38 }} )
+  </label>
+
+      {% if countsubcat.15 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="15"{% if '15' in checkingsubcat %} checked{% endif %}> Outcome Of Board Meeting ( {{ countsubcat.15 }} )
+  </label>
+
+   {% if countsubcat.17 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="17"{% if '17' in checkingsubcat %} checked{% endif %}> Postal Ballot ( {{ countsubcat.17 }} )
+  </label>
+
+
+    
+    {% if countsubcat.28 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="28"{% if '28' in checkingsubcat %} checked{% endif %}> Press Release ( {{ countsubcat.28 }} )
+  </label>
+ 
+   {% if countsubcat.9 or countsubcat.10 or countsubcat.11 or countsubcat.16 or countsubcat.19 or countsubcat.21 or countsubcat.4  %}
+   <button type="button" data-toggle="collapse" data-target="#reg" class="btn btn-danger">Regulations</button>
+<div id="reg" class="collapse">
+        {% if countsubcat.31 %}
+  <label class="btn btn-info">
+     {% else %} 
+ <label class="btn btn-info" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="31"{% if '31' in checkingsubcat %} checked{% endif %}> Reg. 10 (1)(a) ( {{ countsubcat.31 }} )
+  </label>
+
+      {% if countsubcat.21 %}
+  <label class="btn btn-info">
+     {% else %} 
+ <label class="btn btn-info" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="21"{% if '21' in checkingsubcat %} checked{% endif %}> Reg. 10(6) ( {{ countsubcat.21 }} )
+  </label>
+
+      {% if countsubcat.11 %}
+  <label class="btn btn-info">
+     {% else %} 
+ <label class="btn btn-info" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="11"{% if '11' in checkingsubcat %} checked{% endif %}> Reg. 29(1) ( {{ countsubcat.11 }} )
+  </label>
+
+    {% if countsubcat.9 %}
+  <label class="btn btn-info">
+     {% else %} 
+ <label class="btn btn-info" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="9"{% if '9' in checkingsubcat %} checked{% endif %}> Reg. 29(2) ( {{ countsubcat.9 }} )
+  </label>
+    {% if countsubcat.4 %}
+  <label class="btn btn-info">
+     {% else %} 
+ <label class="btn btn-info" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="4"{% if '4' in checkingsubcat %} checked{% endif %}> Reg. 30 ( {{ countsubcat.4 }} )
+  </label>
+ 
+    {% if countsubcat.10 %}
+  <label class="btn btn-info">
+     {% else %} 
+ <label class="btn btn-info" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="10"{% if '10' in checkingsubcat %} checked{% endif %}> Reg. 31(1) and 31(2) ( {{ countsubcat.10 }} )
+  </label>
+
+    {% if countsubcat.19 %}
+  <label class="btn btn-info">
+     {% else %} 
+ <label class="btn btn-info" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="19"{% if '19' in checkingsubcat %} checked{% endif %}> Reg. 39(3) ( {{ countsubcat.19 }} )
+  </label>
+
+    {% if countsubcat.16 %}
+  <label class="btn btn-info">
+ {% else %} 
+ <label class="btn btn-info" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="16"{% if '16' in checkingsubcat %} checked{% endif %}> Reg. 44(3) ( {{ countsubcat.16 }} )
+  </label>
+</div>
+  <br>
+{% endif %}
+     {% if countsubcat.2 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="2"{% if '2' in checkingsubcat %} checked{% endif %}> Shareholding ( {{ countsubcat.2 }} )
+  </label>
+ 
+    {% if countsubcat.3 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="3"{% if '3' in checkingsubcat %} checked{% endif %}> Share certificate ( {{ countsubcat.3 }} )
+  </label>
+ 
+
+    {% if countsubcat.7 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="7"{% if '7' in checkingsubcat %} checked{% endif %}>Unaudited Financial Results ( {{ countsubcat.7 }} )
+  </label>
+
+    {% if countsubcat.5 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="5"{% if '5' in checkingsubcat %} checked{% endif %}> Voting Results ( {{ countsubcat.5 }} )
+  </label>
+
+ 
+
+    {% if countsubcat.12 %}
+  <label class="btn btn-primary">
+     {% else %} 
+ <label class="btn btn-primary" style="opacity: 0.3;">   
+ {% endif %} 
+    <input type="checkbox" name="subcategorylist" id="agm" value="12"{% if '12' in checkingsubcat %} checked{% endif %}> Others ( {{ countsubcat.12 }} )
+  </label>
+</div></div>
+
+{% load bootstrap4 %}
+        {% bootstrap_css %}
+        <!-- {% bootstrap_javascript jquery='full' %} -->
+        {{ form.media }}
+
+          <div class="input-group date my-custom-class">
+          {% csrf_token %}
+          {% bootstrap_form form %}
+         
+          <div class="input-group-addon input-group-append">
+          </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Go!</button>
+        </form>
+
+ 
+
+
+
+          <!-- DataTables Example -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="fas fa-table"></i>
+              Data Table Example</div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" data-order = '[[4, "desc"]]'>
+                  <thead>
+                    <tr>
+                      <th>Head</th>
+                      <th>Category</th>
+                      <th>Date</th>
+                      <th>Pdf</th>
+                    </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                      <th>Head</th>
+                      <th>Category</th>
+                      <th>Date</th>
+                      <th>Pdf</th>
+                    </tr>
+                  </tfoot>
+                  <tbody>
+                  {% for ann in query_set %}
+                    <tr>
+                      <td>
+                            <a href="" data-toggle="collapse" data-target="#demo{{ann.ca_id}}">{{ann.ca_head|safe }}</a>
+                            <div id="demo{{ann.ca_id}}" class="collapse">
+                            {{ann.ca_desc|safe}}
+                            </div>
+                      </td>
+                      <td width=150vw>{{ann.ct }}</td>
+                      <td width=170vw>{{ann.ca_datetime }}</td>
+                      <td>
+                      {% if ann.ca_data != "" %}
+                        <a href={{ann.ca_data}} target="_blank"><i class="icon-file-pdf"></i></a>
+                      {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+          
+        <!-- /.container-fluid -->
+
+        <!-- Sticky Footer -->
+        
+
+      </div>
+      <!-- /.content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            <a class="btn btn-primary" href="login.html">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <!-- Page level plugin JavaScript-->
+
+
+    <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
+
+
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin.min.js' %}"></script>
+    <!-- Demo scripts for this page-->
+
+    
+    <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
+
+  </body>
+
+</html>
